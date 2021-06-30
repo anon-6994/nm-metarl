@@ -27,14 +27,12 @@ class NMLinear(Module):
         self.gating = gating
 
     def forward(self, data, params=None):
-        ## assert False, 'NMLinearReduced.forward(...). We should never get here'
         output = self.std(data)
         mod_features = self.in_nm_act(self.in_nm(data))
         sign_ = self.out_nm_act(self.out_nm(mod_features))
         if self.gating == 'hard':
             sign_ = torch.sign(sign_)
             sign_[sign_ == 0.] = 1. # a zero value should have sign of 1. and not 0.
-        #print('in nmlinear forward', sign_)
         output *= sign_
         return output
 

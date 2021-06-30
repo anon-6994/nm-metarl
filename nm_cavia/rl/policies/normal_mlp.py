@@ -8,7 +8,7 @@ import torch.nn.functional as F
 from torch.distributions import Normal
 
 from policies.policy import Policy, weight_init
-from policies.nmlinear import NMLinear, NMLinearReduced
+from policies.nmlinear import NMLinear
 
 
 class NormalMLPPolicy(Policy):
@@ -199,7 +199,7 @@ class NMNormalMLPPolicy(Policy):
         layer_sizes = (input_size,) + hidden_sizes
         for i in range(1, self.num_layers):
             self.add_module('layer{0}'.format(i),
-                            NMLinearReduced(layer_sizes[i - 1], layer_sizes[i], nm_size, nm_gate))
+                            NMLinear(layer_sizes[i - 1], layer_sizes[i], nm_size, nm_gate))
         self.mu = nn.Linear(layer_sizes[-1], output_size)
 
         self.sigma = nn.Parameter(torch.Tensor(output_size))
@@ -290,9 +290,9 @@ class NMCaviaMLPPolicy(Policy, nn.Module):
         self.context_params = []
 
         layer_sizes = (input_size,) + hidden_sizes
-        self.add_module('layer{0}'.format(1), NMLinearReduced(layer_sizes[0] + num_context_params, layer_sizes[1], nm_size, nm_gate))
+        self.add_module('layer{0}'.format(1), NMLinear(layer_sizes[0] + num_context_params, layer_sizes[1], nm_size, nm_gate))
         for i in range(2, self.num_layers):
-            self.add_module('layer{0}'.format(i), NMLinearReduced(layer_sizes[i - 1], layer_sizes[i], nm_size, nm_gate))
+            self.add_module('layer{0}'.format(i), NMLinear(layer_sizes[i - 1], layer_sizes[i], nm_size, nm_gate))
 
         self.num_context_params = num_context_params
         self.context_params = torch.zeros(self.num_context_params, requires_grad=True).to(self.device)
